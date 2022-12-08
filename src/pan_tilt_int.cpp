@@ -12,6 +12,7 @@
  */
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Int32MultiArray.h"
 #include <sstream>
 #include "rehab_head_neck_intg/pan_tilt.h"
 #include "rehab_head_neck_intg/pan_tilt_feedback.h"
@@ -22,8 +23,9 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "pan_tilt_int");
   ros::NodeHandle n;
 
-  ros::Publisher pan_tilt_cmd_pub = n.advertise<rehab_head_neck_intg::pan_tilt>("pan_tilt_cmd", 1000);
-  ros::Publisher pan_tilt_feedback = n.advertise<rehab_head_neck_intg::pan_tilt_feedback>("pan_tilt_feedback", 1000);
+  ros::Publisher pan_pub = n.advertise<std_msgs::Int32MultiArray>("pan_angles", 1000);
+  ros::Publisher tilt_pub = n.advertise<std_msgs::Int32MultiArray>("tilt_angles", 1000);
+
 
   ros::Rate loop_rate(10);
 
@@ -31,24 +33,22 @@ int main(int argc, char **argv)
   int count = 0;
   while (ros::ok())
   {
-    rehab_head_neck_intg::pan_tilt motion_msg;
-    rehab_head_neck_intg::pan_tilt_feedback feedback_msg;
+    
+    std_msgs::Int32MultiArray pan_msg;
+    std_msgs::Int32MultiArray tilt_msg;
+
+    pan_msg.data = {25,-25,0};
+    tilt_msg.data = {20,0,20,0};
+    
 
     int value;;
     std::cout<<"Enter Value: "<<std::endl;
     std::cin>> value;
 
-    motion_msg.pan_angle = {-30,30};
-    motion_msg.tilt_angle= {0, 0};
-    
-    
-    feedback_msg.pan_feedback = true;
-    feedback_msg.tilt_feedback = false;
-
     if (value == 1)
     {
-      pan_tilt_cmd_pub.publish(motion_msg);
-      pan_tilt_feedback.publish(feedback_msg);
+      pan_pub.publish(pan_msg);
+      tilt_pub.publish(tilt_msg);
       ros::spinOnce();
     }
 
